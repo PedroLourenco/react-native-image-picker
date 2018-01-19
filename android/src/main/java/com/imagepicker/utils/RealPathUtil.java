@@ -21,19 +21,16 @@ public class RealPathUtil {
 	public static @Nullable Uri compatUriFromFile(@NonNull final Context context,
 												  @NonNull final File file) {
 		Uri result = null;
-		if (Build.VERSION.SDK_INT < 21) {
-			result = Uri.fromFile(file);
+		final String packageName = context.getApplicationContext().getPackageName();
+		final String authority =  new StringBuilder(packageName).append(".provider").toString();
+
+		try {
+			result = FileProvider.getUriForFile(context, authority, file);
 		}
-		else {
-			final String packageName = context.getApplicationContext().getPackageName();
-			final String authority =  new StringBuilder(packageName).append(".provider").toString();
-			try {
-				result = FileProvider.getUriForFile(context, authority, file);
-			}
-			catch(IllegalArgumentException e) {
-				e.printStackTrace();
-			}
+		catch(IllegalArgumentException e) {
+			e.printStackTrace();
 		}
+
 		return result;
 	}
 
